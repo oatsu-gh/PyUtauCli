@@ -1,10 +1,10 @@
 ﻿import os.path
 
-import common.convert_notenum as convert_notenum
+from ..common import convert_notenum
 
 
 class MapRecord:
-    '''PrefixMapの各行のデータを扱います。
+    """PrefixMapの各行のデータを扱います。
 
     Attributes
     ----------
@@ -16,14 +16,14 @@ class MapRecord:
 
     prefix: str
     suffix: str
-    '''
+    """
 
     key: str
     prefix: str
     suffix: str
 
     def __init__(self, record: str):
-        '''
+        """
         Parameters
         ----------
         record: str
@@ -33,21 +33,23 @@ class MapRecord:
         ------
         ValueError
             レコードのフォーマットに則らない文字列が渡されたとき
-        '''
+        """
         try:
             self.key, self.prefix, self.suffix = record.split("\t")
-        except:
-            raise ValueError("can't set prefix map value.{} is bad format.".format(record))
+        except Exception as e:
+            raise ValueError(
+                f"can't set prefix map value.{record} is bad format."
+            ) from e
 
 
 class PrefixMap:
-    '''prefix.mapのデータを扱います。
-    '''
-    _key: list = [i for i in range(24, 108)]
+    """prefix.mapのデータを扱います。"""
+
+    _key: list = list(range(24, 108))
     _values: dict = {}
 
     def __init__(self, dirpath: str = ""):
-        '''
+        """
         Parameters
         ----------
         dirpath: str, default ""
@@ -59,7 +61,7 @@ class PrefixMap:
             load実行時prefix.mapが見つからなかった場合
         UnicodeDecodeError
             load実行時ファイルがcp932でもutf-8でもなかった場合
-        '''
+        """
         for i in self._key:
             self._values[i] = MapRecord(convert_notenum.toStr(i) + "\t\t")
         if dirpath != "":
@@ -71,7 +73,7 @@ class PrefixMap:
         return self._values[convert_notenum.toInt(key)]
 
     def load(self, dirpath: str, filename: str = "prefix.map"):
-        '''
+        """
         *dirpath\\\\prefix.map* を読み込んでself._valueを更新する。
 
         Parameters
@@ -88,18 +90,18 @@ class PrefixMap:
             prefix.mapが見つからなかった場合
         UnicodeDecodeError
             ファイルがcp932でもutf-8でもなかった場合
-        '''
+        """
         filepath: str = os.path.join(dirpath, filename)
         lines: list
         if not os.path.isfile(filepath):
-            raise FileNotFoundError("{} is not found.".format(filepath))
+            raise FileNotFoundError(f"{filepath} is not found.")
 
         try:
-            with open(filepath, "r", encoding="cp932") as fr:
+            with open(filepath, encoding="cp932") as fr:
                 lines = fr.read().replace("\r", "").split("\n")
-        except:
+        except Exception:
             try:
-                with open(filepath, "r", encoding="utf-8") as fr:
+                with open(filepath, encoding="utf-8") as fr:
                     lines = fr.read().replace("\r", "").split("\n")
             except UnicodeDecodeError as e:
                 e.reason = "can't read prefix.map. because required character encoding is utf-8 or cp932"
@@ -113,7 +115,7 @@ class PrefixMap:
             self._values[convert_notenum.toInt(line.split("\t")[0])] = MapRecord(line)
 
     def save(self, dirpath: str, filename: str = "prefix.map", encoding: str = "cp932"):
-        '''
+        """
         *dirpath\\\\prefix.map* を *encoding* で保存する。
 
         Parameters
@@ -135,8 +137,15 @@ class PrefixMap:
             character.txtに書き込み権限がないとき
         UnicodeDecodeError
             パラメータをcp932に変換できなかったとき
-        '''
+        """
         filepath: str = os.path.join(dirpath, filename)
         with open(filepath, "w", encoding=encoding) as fw:
             for i in range(len(self._values)):
-                fw.write(self._values[107 - i].key + "\t" + self._values[107 - i].prefix + "\t" + self._values[107 - i].suffix + "\r\n")
+                fw.write(
+                    self._values[107 - i].key
+                    + "\t"
+                    + self._values[107 - i].prefix
+                    + "\t"
+                    + self._values[107 - i].suffix
+                    + "\r\n"
+                )
