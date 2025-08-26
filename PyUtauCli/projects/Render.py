@@ -18,7 +18,11 @@ default_logger = mylogger.get_logger(__name__, False)
 
 class FastResamp(PyRwu.Resamp):
     def _getAp(
-        self, f0_floor: float, f0_ceil: float, frame_period: float, threshold: float
+        self,
+        f0_floor: float = 71.0,
+        f0_ceil: float = 800.0,
+        frame_period: float = 5.0,
+        threshold: float = 0.85,
     ) -> None:
         self._ap = np.zeros_like(self._sp)
 
