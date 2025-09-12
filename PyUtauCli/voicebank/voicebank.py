@@ -5,9 +5,8 @@ from logging import Logger
 
 from ..settings import logger as mylogger
 from .character import Character
-from .prefixmap import PrefixMap
 from .oto import Oto
-
+from .prefixmap import PrefixMap
 
 default_logger = mylogger.get_logger(__name__, False)
 

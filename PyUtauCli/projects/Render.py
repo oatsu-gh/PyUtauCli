@@ -7,11 +7,11 @@ import numpy as np
 import PyRwu
 import PyWavTool
 
-from .Ust import Ust
-from .RenderNote import RenderNote
-from ..voicebank import VoiceBank
 from ..settings import logger as mylogger
 from ..settings import settings
+from ..voicebank import VoiceBank
+from .RenderNote import RenderNote
+from .Ust import Ust
 
 default_logger = mylogger.get_logger(__name__, False)
 
@@ -42,9 +42,9 @@ class Render:
         self,
         ust: Ust,
         *,
-        voice_dir: str = "",
-        cache_dir: str = "",
-        output_file: str = "",
+        voice_dir: str = '',
+        cache_dir: str = '',
+        output_file: str = '',
         logger: Logger | None = None,
     ) -> None:
         """
@@ -70,12 +70,12 @@ class Render:
 
         self.vb = VoiceBank(self._init_voicedir(voice_dir))
 
-        if cache_dir != "":
+        if cache_dir != '':
             self._cache_dir = cache_dir
         else:
             self._cache_dir = ust.cache_dir
 
-        if output_file != "":
+        if output_file != '':
             self._output_file = output_file
         else:
             self._output_file = ust.output_file
@@ -103,17 +103,18 @@ class Render:
             %VOICE%をsetting.VOICE_ROOTに置き換えたとき、指定したパスのUTAU音源フォルダが見つからなかったとき。
 
         """
-        if voice_dir == "":
+        if voice_dir == '':
             voice_dir = self._ust.voice_dir
         for root_dir in settings.VOICE_ROOT:
             if VoiceBank.is_utau_voicebank(
-                os.path.join(root_dir, voice_dir.replace("%VOICE%", ""))
+                os.path.join(root_dir, voice_dir.replace('%VOICE%', ''))
             ):
-                voice_dir = os.path.join(root_dir, voice_dir.replace("%VOICE%", ""))
+                voice_dir = os.path.join(root_dir, voice_dir.replace('%VOICE%', ''))
                 break
         else:
-            self.logger.error(f"{voice_dir} is not found or not utau vb.")
-            raise FileNotFoundError(f"{voice_dir} is not found or not utau vb.")
+            error_msg = f'VoiceDir {voice_dir} is not found or not utau vb.'
+            self.logger.error(error_msg)
+            raise FileNotFoundError(error_msg)
 
         return voice_dir
 
@@ -131,8 +132,8 @@ class Render:
             if not note.require_resamp:
                 continue
             if force or not os.path.isfile(note.cache_path):
-                self.logger.info(
-                    "{} {} {} {} {} {} {} {} {} {} {} {} {}".format(  # noqa: UP032
+                self.logger.debug(
+                    '{} {} {} {} {} {} {} {} {} {} {} {} {}'.format(  # noqa: UP032
                         note.input_path,
                         note.cache_path,
                         note.target_tone,
@@ -166,7 +167,7 @@ class Render:
                 )
                 resamp.resamp()
             else:
-                self.logger.info(f"{note.cache_path} have be cached")
+                self.logger.debug('%s have be cached', note.cache_path)
 
     def fast_resamp(self, *, force: bool = False):
         """
@@ -182,23 +183,23 @@ class Render:
             if not note.require_resamp:
                 continue
             if force or not os.path.isfile(note.cache_path):
-                self.logger.info(
-                    "{} {} {} {} {} {} {} {} {} {} {} {} {}".format(  # noqa: UP032
-                        note.input_path,
-                        note.cache_path,
-                        note.target_tone,
-                        note.velocity,
-                        note.flags,
-                        note.offset,
-                        note.target_ms,
-                        note.fixed_ms,
-                        note.end_ms,
-                        note.intensity,
-                        note.modulation,
-                        note.tempo,
-                        note.pitchbend,
-                    )
+                self.logger.debug(
+                    '%s %s %s %s %s %s %s %s %s %s %s %s %s',
+                    note.input_path,
+                    note.cache_path,
+                    note.target_tone,
+                    note.velocity,
+                    note.flags,
+                    note.offset,
+                    note.target_ms,
+                    note.fixed_ms,
+                    note.end_ms,
+                    note.intensity,
+                    note.modulation,
+                    note.tempo,
+                    note.pitchbend,
                 )
+
                 resamp = FastResamp(
                     note.input_path,
                     note.cache_path,
@@ -217,50 +218,50 @@ class Render:
                 )
                 resamp.resamp()
             else:
-                self.logger.info(f"{note.cache_path} have be cached")
+                self.logger.debug(f'{note.cache_path} have be cached')
 
     def append(self):
         """
         PyWavToolを使用してキャッシュファイルから出力ファイルを合成する。
         """
         output_dir: str = os.path.split(self._output_file)[0]
-        if output_dir != "":
+        if output_dir != '':
             os.makedirs(output_dir, exist_ok=True)
 
-        if os.path.isfile(self._output_file + ".whd"):
-            os.remove(self._output_file + ".whd")
+        if os.path.isfile(self._output_file + '.whd'):
+            os.remove(self._output_file + '.whd')
 
-        if os.path.isfile(self._output_file + ".dat"):
-            os.remove(self._output_file + ".dat")
+        if os.path.isfile(self._output_file + '.dat'):
+            os.remove(self._output_file + '.dat')
         wavtool = PyWavTool.WavTool(self._output_file)
         for note in self.notes:
             if note.direct:
-                self.logger.info(
-                    f"{note.input_path} {note.envelope} {note.stp + note.offset} {note.output_ms}"
+                self.logger.debug(
+                    f'{note.input_path} {note.envelope} {note.stp + note.offset} {note.output_ms}'
                 )
                 wavtool.inputCheck(note.input_path)
-                wavtool.setEnvelope([float(item) for item in note.envelope.split(" ")])
+                wavtool.setEnvelope([float(item) for item in note.envelope.split(' ')])
                 wavtool.applyData(note.stp + note.offset, note.output_ms)
             else:
-                self.logger.info(
-                    f"{note.cache_path} {note.envelope} {note.stp} {note.output_ms}"
+                self.logger.debug(
+                    f'{note.cache_path} {note.envelope} {note.stp} {note.output_ms}'
                 )
                 wavtool.inputCheck(note.cache_path)
-                wavtool.setEnvelope([float(item) for item in note.envelope.split(" ")])
+                wavtool.setEnvelope([float(item) for item in note.envelope.split(' ')])
                 wavtool.applyData(note.stp, note.output_ms)
         wavtool.write()
 
-        with open(self._output_file, "wb") as fw:
-            with open(self._output_file + ".whd", "rb") as fr:
+        with open(self._output_file, 'wb') as fw:
+            with open(self._output_file + '.whd', 'rb') as fr:
                 fw.write(fr.read())
-            with open(self._output_file + ".dat", "rb") as fr:
+            with open(self._output_file + '.dat', 'rb') as fr:
                 fw.write(fr.read())
 
-        if os.path.isfile(self._output_file + ".whd"):
-            os.remove(self._output_file + ".whd")
+        if os.path.isfile(self._output_file + '.whd'):
+            os.remove(self._output_file + '.whd')
 
-        if os.path.isfile(self._output_file + ".dat"):
-            os.remove(self._output_file + ".dat")
+        if os.path.isfile(self._output_file + '.dat'):
+            os.remove(self._output_file + '.dat')
 
     def clean(self):
         """
