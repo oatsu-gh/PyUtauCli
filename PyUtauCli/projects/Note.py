@@ -1,9 +1,10 @@
 ﻿# ruff: noqa: F405
 import os.path
 
+from PyUtauCli.voicebank.oto import Oto
+from PyUtauCli.voicebank.prefixmap import PrefixMap
+
 from .Entry import *  # noqa: F403
-from ..voicebank.prefixmap import PrefixMap
-from ..voicebank.oto import Oto
 
 
 class Note:
@@ -243,9 +244,9 @@ class Note:
         """
         alias: str
         if not self.lyric.hasValue:
-            raise ValueError("lyric is not initial")
+            raise ValueError('lyric is not initial')
         if not self.notenum.hasValue:
-            raise ValueError("notenum is not initial")
+            raise ValueError('notenum is not initial')
 
         alias = self._init_alias(oto, prefix)
         self._apply_oto_to_pre(alias, oto)
@@ -273,12 +274,12 @@ class Note:
 
         lyric: str = self.lyric.value
         no_prefix: bool = False
-        if "?" in lyric:
-            lyric = lyric.replace("?", "")
+        if '?' in lyric:
+            lyric = lyric.replace('?', '')
             no_prefix = True
 
-        if "!" in lyric:
-            lyric = lyric.replace("!", "")
+        if '!' in lyric:
+            lyric = lyric.replace('!', '')
             self.autoren = True
 
         if self.atAlias.hasValue:
@@ -307,7 +308,7 @@ class Note:
                 oto[lyric].otopath, oto[lyric].filename
             )
             return lyric
-        return ""
+        return ''
 
     def _apply_oto_to_pre(self, alias: str, oto: Oto):
         """
@@ -323,7 +324,7 @@ class Note:
         """
         if self.pre.hasValue:
             return
-        if alias == "":
+        if alias == '':
             self.pre.value = 0
         else:
             self.pre.value = oto[alias].pre
@@ -343,7 +344,7 @@ class Note:
         """
         if self.ove.hasValue:
             return
-        if alias == "":
+        if alias == '':
             self.ove.value = 0
         else:
             self.ove.value = oto[alias].ove
@@ -366,13 +367,13 @@ class Note:
             return
 
         if not self.prev.lyric.hasValue:
-            raise ValueError("prev lyric is not initial")
+            raise ValueError('prev lyric is not initial')
 
         prevMsLength: int = self.prev.msLength
         realPre: float = self.pre.value * self.velocity.rate
         realOve: float = self.ove.value * self.velocity.rate
         realStp: float = self.stp.value * self.velocity.rate
-        if self.prev.lyric.value != "R":
+        if self.prev.lyric.value != 'R':
             prevMsLength /= 2
 
         if prevMsLength < (realPre - realOve):
@@ -399,7 +400,7 @@ class Note:
             tempoもしくはlengthが初期化されていないとき。
         """
         if not self.length.hasValue:
-            raise ValueError("length is not initial")
+            raise ValueError('length is not initial')
 
         # if not self.tempo.hasValue:
         #    raise ValueError("tempo is not initial")

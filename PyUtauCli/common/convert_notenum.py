@@ -62,8 +62,9 @@ def toInt(tone: str) -> int:
     """
     try:
         return TONE_NUM[tone[:-1]] + (int(tone[-1]) + 1) * 12
-    except:
-        raise ValueError(f'{tone} is not tone-name.')
+    except Exception as e:
+        msg = f'{tone} is not tone-name.'
+        raise ValueError(msg) from e
 
 
 def toStr(notenum: int, mark: str = '#') -> str:
@@ -91,5 +92,6 @@ def toStr(notenum: int, mark: str = '#') -> str:
     """
     try:
         return TONE_NAME[mark][notenum % 12] + str(notenum // 12 - 1)
-    except:
-        raise ValueError(f'{mark} is not sharp or flat.[#,b,♯,♭]')
+    except Exception as e:
+        msg = f'{mark} is not sharp or flat.[#,b,♯,♭]'
+        raise ValueError(msg) from e

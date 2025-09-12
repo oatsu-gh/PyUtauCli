@@ -1,13 +1,13 @@
-﻿import os.path
-import hashlib
-
+﻿import hashlib
+import os.path
 
 import numpy as np
 import PyRwu.pitch
 
+from PyUtauCli.settings import settings
+from PyUtauCli.voicebank import VoiceBank
+
 from .Note import Note
-from ..voicebank import VoiceBank
-from ..settings import settings
 
 
 class RenderNote:
@@ -235,28 +235,28 @@ class RenderNote:
             self._require_resamp = False
         self._intensity = note.intensity.value
         self._modulation = note.modulation.value
-        self._tempo = f"!{note.tempo.value:.2f}"
-        if note.lyric.value != "R":
+        self._tempo = f'!{note.tempo.value:.2f}'
+        if note.lyric.value != 'R':
             self._pitchbend = self._get_pitches(note, mode2)
         else:
-            self._pitchbend = ""
+            self._pitchbend = ''
         self._stp = note.atStp.value
         if note.envelope.hasValue:
-            if "%" in note.envelope.value:
+            if '%' in note.envelope.value:
                 self._envelope = note.envelope.value.replace(
-                    "%", str(note.atOve)
-                ).replace(",", " ")
+                    '%', str(note.atOve)
+                ).replace(',', ' ')
             else:
                 self._envelope = (
-                    note.envelope.value.replace(",", " ") + " " + str(note.atOve)
+                    note.envelope.value.replace(',', ' ') + ' ' + str(note.atOve)
                 )
         else:
-            self._envelope = settings.DEFAULT_ENV.replace("%", str(note.atOve))
+            self._envelope = settings.DEFAULT_ENV.replace('%', str(note.atOve))
         self._cache_path = os.path.join(
             cachedir,
-            "{}_{}_{}_{}.wav".format(
+            '{}_{}_{}_{}.wav'.format(
                 note.num.value[1:],
-                note.atAlias.value.replace(" ", "+"),
+                note.atAlias.value.replace(' ', '+'),
                 note.notenum.get_tone_name(),
                 self._get_cache_hash(note),
             ),
@@ -282,7 +282,7 @@ class RenderNote:
 
         """
         return hashlib.md5(  # noqa: S324
-            "{}_{}_{}_{}_{}_{}_{}_{}".format(  # noqa: UP032
+            '{}_{}_{}_{}_{}_{}_{}_{}'.format(  # noqa: UP032
                 note.pre.value,
                 note.stp.value,
                 note.velocity.value,
@@ -322,7 +322,7 @@ class RenderNote:
         offset: float = note.atPre.value + note.atStp.value
         if mode2:
             base_pitches: np.ndarray = self._get_base_pitches(note, t)
-            if note.prev is not None and note.prev.lyric.value != "R":
+            if note.prev is not None and note.prev.lyric.value != 'R':
                 base_pitches += self._interp_pitches(
                     note.prev, t, offset - note.prev.msLength
                 )
@@ -331,7 +331,7 @@ class RenderNote:
                 )
             base_pitches += self._interp_pitches(note, t, offset)
             base_pitches += self._get_vibrato_pitches(note, t, offset)
-            if note.next is not None and note.next.lyric.value != "R":
+            if note.next is not None and note.next.lyric.value != 'R':
                 base_pitches += self._interp_pitches(
                     note.next, t, offset + note.msLength
                 )
@@ -374,7 +374,7 @@ class RenderNote:
         offset: float = note.atPre.value + note.atStp.value
         start: int
         end: int
-        if note.prev is not None and note.prev.lyric.value != "R":
+        if note.prev is not None and note.prev.lyric.value != 'R':
             prev_offset: float = offset - note.prev.msLength
             if note.prev.pbs.time + prev_offset < 0:
                 start = 0
@@ -388,7 +388,7 @@ class RenderNote:
                 base_pitches[start:end] = (
                     note.prev.notenum.value - note.notenum.value
                 ) * 100
-        if note.next is not None and note.next.lyric.value != "R":
+        if note.next is not None and note.next.lyric.value != 'R':
             next_offset: float = offset + note.msLength
             if t[-1] >= note.next.pbs.time + next_offset:
                 start = np.where(t >= note.next.pbs.time + next_offset)[0][0]
@@ -435,22 +435,22 @@ class RenderNote:
             start, end, cycle, height, phase = self._get_interp_param(x, y, t, i)
             if start >= end:
                 continue
-            if mode[i - 1] == "":
+            if mode[i - 1] == '':
                 # cos(-pi) → cos(0)の補完
                 pitches[start : end + 1] = self._interp_default(
                     cycle, height, phase, y[i - 1]
                 )
-            elif mode[i - 1] == "s":
+            elif mode[i - 1] == 's':
                 # 線形補完
                 pitches[start : end + 1] = self._interp_s(
                     cycle, height, phase, y[i - 1]
                 )
-            elif mode[i - 1] == "r":
+            elif mode[i - 1] == 'r':
                 # sin(0) → sin(pi/2)の補完
                 pitches[start : end + 1] = self._interp_r(
                     cycle, height, phase, y[i - 1]
                 )
-            elif mode[i - 1] == "j":
+            elif mode[i - 1] == 'j':
                 # cos(0) → cos(pi/2)の補完
                 pitches[start : end + 1] = self._interp_j(
                     cycle, height, phase, y[i - 1]
@@ -551,13 +551,13 @@ class RenderNote:
             x[i + 1] = x[i] + note.pbw.value[i]
         x = x + note.pbs.time + offset
         y: np.ndarray = np.zeros_like(x)
-        if note.prev is not None and note.prev.lyric.value != "R":
+        if note.prev is not None and note.prev.lyric.value != 'R':
             y[0] = (note.prev.notenum.value - note.notenum.value) * 100
         else:
             y[0] = note.pbs.height * 10
         for i in range(len(note.pby.value)):
             y[i + 1] = note.pby.value[i] * 10
-        mode: list = (note.pbm.value + [""] * (len(x) - 1))[: len(x) - 1]
+        mode: list = (note.pbm.value + [''] * (len(x) - 1))[: len(x) - 1]
 
         return x, y, mode
 
@@ -642,14 +642,14 @@ class RenderNote:
         result: str
         """
         if value < 26:  # A-Z
-            return chr(value + ord("A"))
+            return chr(value + ord('A'))
         if value < 52:
-            return chr(value + ord("a") - 26)
+            return chr(value + ord('a') - 26)
         if value < 62:
-            return chr(value + ord("0") - 52)
+            return chr(value + ord('0') - 52)
         if value == 62:
-            return "+"
-        return "/"
+            return '+'
+        return '/'
 
     @staticmethod
     def encodeBase64(values: np.ndarray) -> list:
@@ -695,18 +695,18 @@ class RenderNote:
         -------
         result: str
         """
-        result: str = ""
-        tmp: str = ""
+        result: str = ''
+        tmp: str = ''
         num: int = 0
         for value in values:
             if tmp != value:
                 tmp = value
                 if num != 0:
-                    result += f"#{num}#"
+                    result += f'#{num}#'
                 num = 0
                 result += value
             else:
                 num += 1
         if num != 0:
-            result += f"#{num}#"
+            result += f'#{num}#'
         return result

@@ -7,9 +7,10 @@ import numpy as np
 import PyRwu
 import PyWavTool
 
-from ..settings import logger as mylogger
-from ..settings import settings
-from ..voicebank import VoiceBank
+from PyUtauCli.settings import logger as mylogger
+from PyUtauCli.settings import settings
+from PyUtauCli.voicebank import VoiceBank
+
 from .RenderNote import RenderNote
 from .Ust import Ust
 
@@ -218,7 +219,7 @@ class Render:
                 )
                 resamp.resamp()
             else:
-                self.logger.debug(f'{note.cache_path} have be cached')
+                self.logger.debug('%s have be cached', note.cache_path)
 
     def append(self):
         """
@@ -237,14 +238,26 @@ class Render:
         for note in self.notes:
             if note.direct:
                 self.logger.debug(
-                    f'{note.input_path} {note.envelope} {note.stp + note.offset} {note.output_ms}'
+                    '%s %s %s %s',
+                    note.input_path,
+                    note.envelope,
+                    note.stp + note.offset,
+                    note.output_ms,
                 )
-                wavtool.inputCheck(note.input_path)
-                wavtool.setEnvelope([float(item) for item in note.envelope.split(' ')])
-                wavtool.applyData(note.stp + note.offset, note.output_ms)
+                self.logger.debug(
+                    '%s %s %s %s',
+                    note.cache_path,
+                    note.envelope,
+                    note.stp,
+                    note.output_ms,
+                )
             else:
                 self.logger.debug(
-                    f'{note.cache_path} {note.envelope} {note.stp} {note.output_ms}'
+                    '%s %s %s %s',
+                    note.cache_path,
+                    note.envelope,
+                    note.stp,
+                    note.output_ms,
                 )
                 wavtool.inputCheck(note.cache_path)
                 wavtool.setEnvelope([float(item) for item in note.envelope.split(' ')])

@@ -68,15 +68,17 @@ class IntEntry(EntryBase):
             self._value = int(value)
             self._set_update()
             self._hasValue = True
-        except:
-            raise ValueError(f'{value} is not int')
+        except Exception as e:
+            msg = f'{value} is not int'
+            raise ValueError(msg) from e
 
     def init(self, value: int):
         try:
             self._value = int(value)
             self._hasValue = True
-        except:
-            raise ValueError(f'{value} is not int')
+        except Exception as e:
+            msg = f'{value} is not int'
+            raise ValueError(msg) from e
 
     def __str__(self) -> str:
         return str(self.value)
@@ -101,15 +103,17 @@ class FloatEntry(EntryBase):
             self._value = float(value)
             self._set_update()
             self._hasValue = True
-        except:
-            raise ValueError(f'{value} is not float')
+        except Exception as e:
+            msg = f'{value} is not float'
+            raise ValueError(msg) from e
 
     def init(self, value: float):
         try:
             self._value = float(value)
             self._hasValue = True
-        except:
-            raise ValueError(f'{value} is not float')
+        except Exception as e:
+            msg = f'{value} is not float'
+            raise ValueError(msg) from e
 
     def __str__(self) -> str:
         return ('{:.' + str(self.point) + 'f}').format(self._value)

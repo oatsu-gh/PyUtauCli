@@ -1,12 +1,13 @@
-﻿from .EntryBase import (
-    EntryBase,
-    IntEntry,
-    StringEntry,
-    FloatEntry,
+﻿from PyUtauCli.common import convert_notenum
+
+from .EntryBase import (
     BoolEntry,
+    EntryBase,
+    FloatEntry,
+    IntEntry,
     ListEntry,
+    StringEntry,
 )
-from ..common import convert_notenum
 
 
 class NumberEntry(StringEntry):
@@ -135,22 +136,22 @@ class PBSEntry(EntryBase):
     @time.setter
     def time(self, value: float):
         self._time = float(value)
-        self._value = f"{self._time:.3f};{self._height:.3f}"
+        self._value = f'{self._time:.3f};{self._height:.3f}'
         self._set_update()
         self._hasValue = True
 
     @height.setter
     def height(self, value: float):
         self._height = float(value)
-        self._value = f"{self._time:.3f};{self._height:.3f}"
+        self._value = f'{self._time:.3f};{self._height:.3f}'
         self._set_update()
         self._hasValue = True
 
     @value.setter
     def value(self, value: str):
-        value = value.replace(",", ";")
-        if ";" in value:
-            values: list = value.split(";")
+        value = value.replace(',', ';')
+        if ';' in value:
+            values: list = value.split(';')
             self._time = float(values[0])
             self._height = float(values[1])
             self._value = value
@@ -164,9 +165,9 @@ class PBSEntry(EntryBase):
             self._hasValue = True
 
     def init(self, value: str):
-        value = value.replace(",", ";")
-        if ";" in value:
-            values: list = value.split(";")
+        value = value.replace(',', ';')
+        if ';' in value:
+            values: list = value.split(';')
             self._time = float(values[0])
             self._height = float(values[1])
             self._value = value
@@ -179,45 +180,46 @@ class PBSEntry(EntryBase):
 
     def __str__(self) -> str:
         if self._height == 0:
-            return f"{self._time:.3f}"
+            return f'{self._time:.3f}'
         return self._value
 
 
 class PBYEntry(ListEntry):
     def _check_value(self, value):
-        if value == " ":
+        if value == ' ':
             value = 0
-        if value == "":
+        if value == '':
             value = 0
         return float(value)
 
 
 class PBWEntry(ListEntry):
     def _check_value(self, value):
-        if value == " ":
+        if value == ' ':
             value = 0
-        if value == "":
+        if value == '':
             value = 0
         return float(value)
 
 
 class PBMEntry(ListEntry):
     def _check_value(self, value):
-        if value in ["", "s", "r", "j"]:
+        if value in ['', 's', 'r', 'j']:
             return str(value)
-        raise ValueError(f"{value} is not '',s,r,j")
+        msg = f"{value} is not '',s,r,j"
+        raise ValueError(msg)
 
 
 class EnvelopeEntry(EntryBase):
     _value: str
     _p: list
     _v: list
-    separater: str = ","
+    separater: str = ','
 
     @property
     def value(self) -> str:
         if len(self._p) == 3:
-            return "{:.2f},{:.2f},{:.2f},{},{},{},{}".format(  # noqa: UP032
+            return '{:.2f},{:.2f},{:.2f},{},{},{},{}'.format(  # noqa: UP032
                 self._p[0],
                 self._p[1],
                 self._p[2],
@@ -227,7 +229,7 @@ class EnvelopeEntry(EntryBase):
                 self._v[3],
             )
         if len(self._p) == 4:
-            return "{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f}".format(  # noqa: UP032
+            return '{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f}'.format(  # noqa: UP032
                 self._p[0],
                 self._p[1],
                 self._p[2],
@@ -238,7 +240,7 @@ class EnvelopeEntry(EntryBase):
                 self._p[3],
             )
         if len(self._p) == 5:
-            return "{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f},{:.2f},{}".format(  # noqa: UP032
+            return '{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f},{:.2f},{}'.format(  # noqa: UP032
                 self._p[0],
                 self._p[1],
                 self._p[2],
@@ -278,7 +280,7 @@ class EnvelopeEntry(EntryBase):
                 elif i in [3, 4, 5, 6, 10]:
                     self._v.append(int(tmp[i]))
         except Exception as e:
-            raise ValueError(f"{value} is not envelope pattern") from e
+            raise ValueError(f'{value} is not envelope pattern') from e
         self._value = value
 
     def init(self, value: list):
@@ -307,7 +309,7 @@ class VibratoEntry(EntryBase):
     _height: float
     _amp: float
     _value: str
-    separater: str = ","
+    separater: str = ','
 
     @property
     def length(self) -> float:
@@ -343,7 +345,7 @@ class VibratoEntry(EntryBase):
 
     @property
     def value(self) -> str:
-        return "{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(  # noqa: UP032
+        return '{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}'.format(  # noqa: UP032
             self._length,
             self._cycle,
             self._depth,
