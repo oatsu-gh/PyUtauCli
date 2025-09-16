@@ -14,7 +14,7 @@ from PyUtauCli.voicebank import VoiceBank
 from .RenderNote import RenderNote
 from .Ust import Ust
 
-default_logger = mylogger.get_logger(__name__, False)
+default_logger = mylogger.get_logger(__name__, verbose=False)
 
 
 class FastResamp(PyRwu.Resamp):
@@ -36,7 +36,7 @@ class Render:
     _cache_dir: str
     _output_file: str
     _ust: Ust
-    notes: list
+    notes: list[RenderNote]
     vb: VoiceBank
 
     def __init__(
@@ -133,22 +133,23 @@ class Render:
             if not note.require_resamp:
                 continue
             if force or not os.path.isfile(note.cache_path):
+                args = f'{note.input_path} {note.cache_path} {note.target_tone} {note.velocity} {note.flags} {note.offset} {note.target_ms} {note.fixed_ms} {note.end_ms} {note.intensity} {note.modulation} {note.tempo} {note.pitchbend}'
+
                 self.logger.debug(
-                    '{} {} {} {} {} {} {} {} {} {} {} {} {}'.format(  # noqa: UP032
-                        note.input_path,
-                        note.cache_path,
-                        note.target_tone,
-                        note.velocity,
-                        note.flags,
-                        note.offset,
-                        note.target_ms,
-                        note.fixed_ms,
-                        note.end_ms,
-                        note.intensity,
-                        note.modulation,
-                        note.tempo,
-                        note.pitchbend,
-                    )
+                    '%s %s %s %s %s %s %s %s %s %s %s %s %s',
+                    note.input_path,
+                    note.cache_path,
+                    note.target_tone,
+                    note.velocity,
+                    note.flags,
+                    note.offset,
+                    note.target_ms,
+                    note.fixed_ms,
+                    note.end_ms,
+                    note.intensity,
+                    note.modulation,
+                    note.tempo,
+                    note.pitchbend,
                 )
                 resamp = PyRwu.Resamp(
                     note.input_path,
@@ -242,13 +243,6 @@ class Render:
                     note.input_path,
                     note.envelope,
                     note.stp + note.offset,
-                    note.output_ms,
-                )
-                self.logger.debug(
-                    '%s %s %s %s',
-                    note.cache_path,
-                    note.envelope,
-                    note.stp,
                     note.output_ms,
                 )
             else:
