@@ -1,14 +1,12 @@
-﻿# ruff: noqa: F405
-import os.path
+﻿import os.path
 
-from PyUtauCli.voicebank.oto import Oto
-from PyUtauCli.voicebank.prefixmap import PrefixMap
-
-from .Entry import *  # noqa: F403
+from .Entry import *
+from voicebank.prefixmap import PrefixMap
+from voicebank.oto import Oto
 
 
 class Note:
-    """
+    '''
     ustやプラグインでのNoteを扱います。
 
     Attributes
@@ -156,8 +154,7 @@ class Note:
 
     next: note, default None
         1つ後ろのノートへのポインタ
-    """
-
+    '''
     num: NumberEntry
     length: LengthEntry
     lyric: LyricEntry
@@ -220,12 +217,12 @@ class Note:
         self.region = RegionEntry()
         self.region_end = RegionEndEntry()
         self.flags = FlagsEntry()
-        self.autoren: bool = False
+        self.autoren= bool = False
         self.prev = None
         self.next = None
 
     def apply_oto(self, oto: Oto, prefix: PrefixMap):
-        """
+        '''
         | 原音設定値を読み込んで、pre,oveを更新します。
         | もし、パラメータが初期化されていない場合、atPre,atOve,atStp,atAlias,atFileNameも更新します。
 
@@ -241,12 +238,12 @@ class Note:
         ------
         ValueError
             lyricもしくはnotenumが初期化されていない場合
-        """
+        '''
         alias: str
         if not self.lyric.hasValue:
-            raise ValueError('lyric is not initial')
+            raise ValueError("lyric is not initial")
         if not self.notenum.hasValue:
-            raise ValueError('notenum is not initial')
+            raise ValueError("notenum is not initial")
 
         alias = self._init_alias(oto, prefix)
         self._apply_oto_to_pre(alias, oto)
@@ -254,7 +251,7 @@ class Note:
         self.autofit_atparam()
 
     def _init_alias(self, oto: Oto, prefix: PrefixMap) -> str:
-        """
+        '''
         | 歌詞、音高、prefix.mapを参照してエイリアスを特定します。
         | 一致する原音設定レコードが見つからない場合、""を返します。
         | atAliasが値を持っていなかった場合、atAlias,atFileNameを更新します。
@@ -270,48 +267,33 @@ class Note:
         Returns
         -------
         alias: str, default ""
-        """
+        '''
 
         lyric: str = self.lyric.value
         no_prefix: bool = False
-        if '?' in lyric:
-            lyric = lyric.replace('?', '')
+        if "?" in lyric:
+            lyryc = lyric.replace("?","")
             no_prefix = True
-
-        if '!' in lyric:
-            lyric = lyric.replace('!', '')
+            
+        if "!" in lyric:
+            lyryc = lyric.replace("!","")
             self.autoren = True
 
         if self.atAlias.hasValue:
             return self.atAlias.value
-        if not no_prefix and oto.haskey(
-            prefix[self.notenum.value].prefix
-            + lyric
-            + prefix[self.notenum.value].suffix
-        ):
-            self.atAlias.value = (
-                prefix[self.notenum.value].prefix
-                + lyric
-                + prefix[self.notenum.value].suffix
-            )
-            self.atFileName.value = os.path.join(
-                oto[self.atAlias.value].otopath, oto[self.atAlias.value].filename
-            )
-            return (
-                prefix[self.notenum.value].prefix
-                + lyric
-                + prefix[self.notenum.value].suffix
-            )
-        if oto.haskey(lyric):
+        elif not no_prefix and oto.haskey(prefix[self.notenum.value].prefix + lyric + prefix[self.notenum.value].suffix):
+            self.atAlias.value = prefix[self.notenum.value].prefix + lyric + prefix[self.notenum.value].suffix
+            self.atFileName.value = os.path.join(oto[self.atAlias.value].otopath, oto[self.atAlias.value].filename)
+            return prefix[self.notenum.value].prefix + lyric + prefix[self.notenum.value].suffix
+        elif oto.haskey(lyric):
             self.atAlias.value = lyric
-            self.atFileName.value = os.path.join(
-                oto[lyric].otopath, oto[lyric].filename
-            )
+            self.atFileName.value = os.path.join(oto[lyric].otopath, oto[lyric].filename)
             return lyric
-        return ''
+        else:
+            return ""
 
     def _apply_oto_to_pre(self, alias: str, oto: Oto):
-        """
+        '''
         | 原音設定値を読み込んで、preを更新します。
         | もしalias=""の場合、0で更新します。
 
@@ -321,17 +303,17 @@ class Note:
             otoのkeyになるエイリアス
         oto: Oto
             原音設定ファイル
-        """
+        '''
         if self.pre.hasValue:
             return
-        if alias == '':
+        if alias == "":
             self.pre.value = 0
         else:
             self.pre.value = oto[alias].pre
         self.pre.hasValue = False
 
     def _apply_oto_to_ove(self, alias: str, oto: Oto):
-        """
+        '''
         | 原音設定値を読み込んで、oveを更新します。
         | もしalias=""の場合、0で更新します。
 
@@ -341,24 +323,24 @@ class Note:
             otoのkeyになるエイリアス
         oto: Oto
             原音設定ファイル
-        """
+        '''
         if self.ove.hasValue:
             return
-        if alias == '':
+        if alias == "":
             self.ove.value = 0
         else:
             self.ove.value = oto[alias].ove
         self.ove.hasValue = False
 
     def autofit_atparam(self):
-        """
+        '''
         pre,ove,stp,velocity,prev.length,prev.tempoを勘案して、atpre,atove,atstpを更新します。
 
         Raises
         ------
         ValueError
             prev.lengthがNone出ないにもかかわらず、lyric,length,tempoの値が与えられていないとき。
-        """
+        '''
         if self.prev is None:
             # 前のノートが存在しない場合、自動調整は不要。
             self.atPre.value = self.pre.value
@@ -367,13 +349,13 @@ class Note:
             return
 
         if not self.prev.lyric.hasValue:
-            raise ValueError('prev lyric is not initial')
+            raise ValueError("prev lyric is not initial")
 
         prevMsLength: int = self.prev.msLength
         realPre: float = self.pre.value * self.velocity.rate
         realOve: float = self.ove.value * self.velocity.rate
         realStp: float = self.stp.value * self.velocity.rate
-        if self.prev.lyric.value != 'R':
+        if self.prev.lyric.value != "R":
             prevMsLength /= 2
 
         if prevMsLength < (realPre - realOve):
@@ -387,7 +369,7 @@ class Note:
 
     @property
     def msLength(self) -> float:
-        """
+        '''
         tempoとlengthからmsを計算して返します。
 
         Returns
@@ -398,11 +380,11 @@ class Note:
         ------
         ValueError
             tempoもしくはlengthが初期化されていないとき。
-        """
+        '''
         if not self.length.hasValue:
-            raise ValueError('length is not initial')
+            raise ValueError("length is not initial")
 
-        # if not self.tempo.hasValue:
+        #if not self.tempo.hasValue:
         #    raise ValueError("tempo is not initial")
 
         return 60 / self.tempo.value * self.length.value / 480 * 1000

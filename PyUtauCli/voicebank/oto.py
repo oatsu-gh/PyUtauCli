@@ -3,7 +3,7 @@ import wave
 
 
 class OtoRecord:
-    """oto.iniの各行のデータを扱います。
+    '''oto.iniの各行のデータを扱います。
 
     Attributes
     ----------
@@ -25,7 +25,7 @@ class OtoRecord:
         | ブランク(setparamでいうところの右ブランク)
         | 正の値のときはwav末尾からのmsを表す。
         | 負の値のときはオフセットからのmsの絶対値に-1をかけたものを表す。
-    """
+    '''
 
     otopath: str
     filename: str
@@ -36,18 +36,8 @@ class OtoRecord:
     consonant: float
     blank: float
 
-    def __init__(
-        self,
-        otopath: str,
-        filename: str,
-        alias: str,
-        offset: float,
-        pre: float,
-        ove: float,
-        consonant: float,
-        blank: float,
-    ):
-        """oto.iniの各行のデータを扱います。
+    def __init__(self, otopath: str, filename: str, alias: str, offset: float, pre: float, ove: float, consonant: float, blank: float):
+        '''oto.iniの各行のデータを扱います。
 
         Parameters
         ----------
@@ -70,7 +60,7 @@ class OtoRecord:
             | ブランク(setparamでいうところの右ブランク)
             | 正の値のときはwav末尾からのmsを表す。
             | 負の値のときはオフセットからのmsの絶対値に-1をかけたものを表す。
-        """
+        '''
         self.otopath = otopath
         self.filename = filename
         if alias != "":
@@ -84,7 +74,7 @@ class OtoRecord:
         self.blank = float(blank)
 
     def invert_blank(self, dirpath: str):
-        """
+        '''
         | self.blank値の正負を反転します。
         | blankは正の数の時、ノート末尾からの長さms
         | 負の数の時、その絶対値がoffsetからの長さmsを表します。
@@ -100,11 +90,9 @@ class OtoRecord:
             os.path.join(dirpath, self.otopath, self.filename)のwavファイルが見つからなかったとき
         wave.Error
             os.path.join(dirpath, self.otopath, self.filename)がwavファイルではなかったとき
-        """
+        '''
         if not os.path.isfile(os.path.join(dirpath, self.otopath, self.filename)):
-            raise FileNotFoundError(
-                f"{os.path.join(dirpath, self.otopath, self.filename)} is not found."
-            )
+            raise FileNotFoundError("{} is not found.".format(os.path.join(dirpath, self.otopath, self.filename)))
         with wave.open(os.path.join(dirpath, self.otopath, self.filename), "rb") as wr:
             wav_length = wr.getnframes() / wr.getframerate() * 1000
         if self.blank >= 0:
@@ -114,13 +102,13 @@ class OtoRecord:
 
 
 class Oto:
-    """oto.iniのデータを扱います。"""
-
+    '''oto.iniのデータを扱います。
+    '''
     _values: dict = {}
     _datas_by_file: dict = {}
 
     def __init__(self, dirpath: str = ""):
-        """
+        '''
         Parameters
         ----------
         dirpath: str, default ""
@@ -132,7 +120,7 @@ class Oto:
             load実行時oto.iniが見つからなかった場合
         UnicodeDecodeError
             load実行時ファイルがcp932でもutf-8でもなかった場合
-        """
+        '''
 
         self._values = {}
         self._datas_by_file = {}
@@ -140,23 +128,23 @@ class Oto:
             self.load(dirpath)
 
     def files(self) -> int:
-        """
+        '''
         読み込んだoto.iniファイルの数を返す
 
         Return
         ------
         len(self._datas_by_file): int
-        """
+        '''
         return len(self._datas_by_file)
 
     def records(self) -> int:
-        """
+        '''
         読み込んだoto.iniの合計行数を返す
 
         Return
         ------
         len(self._values): int
-        """
+        '''
         return len(self._values)
 
     def __getitem__(self, key) -> OtoRecord:
@@ -166,7 +154,7 @@ class Oto:
         return key in self._values
 
     def load(self, dirpath: str, recursive: bool = False, subdir: str = ""):
-        """
+        '''
         | dirpathおよびその子フォルダのoto.iniを読み込みself._datas_by_fileとself._valuesを更新する。
         | self._datas_by_fileはdirpathからの相対パスをキーに持つ辞書で、OtoRecord形式のlistを格納する。
         | self._valuesはaliasをkeyとする辞書で、self._datas_by_fileを参照する。
@@ -190,7 +178,7 @@ class Oto:
         UnicodeDecodeError
             ファイルがcp932でもutf-8でもなかった場合
 
-        """
+        '''
 
         if os.path.isfile(os.path.join(dirpath, subdir, "oto.ini")):
             self._loadFile(os.path.join(dirpath, subdir, "oto.ini"), subdir)
@@ -198,9 +186,9 @@ class Oto:
             for filename in os.listdir(os.path.join(dirpath, subdir)):
                 if os.path.isdir(os.path.join(dirpath, subdir, filename)):
                     self.load(dirpath, recursive, os.path.join(subdir, filename))
-
+                    
     def _setValue(self, alias: str, record: OtoRecord):
-        """
+        '''
         | self._values[alias]に値をセットする。
         | self._values[alias]が既に存在する場合、ファイル名が若いものをセットする。
         | ファイル名も同じの場合、offsetが小さいものをセットする。
@@ -211,23 +199,20 @@ class Oto:
             self._valuesのkeyとなるalias
 
         record: OtoRecord
-        """
-
+        '''
+        
         if alias not in self._values:
-            self._values[alias] = record
-        elif (
-            record.filename == self._values[alias].filename
-            and record.offset < self._values[alias].offset
-        ):
-            self._values[alias] = record
+            self._values[alias]=record
+        elif record.filename == self._values[alias].filename and record.offset < self._values[alias].offset:
+            self._values[alias]=record
         elif record.filename < self._values[alias].filename:
-            self._values[alias] = record
+            self._values[alias]=record
 
     def _loadFile(self, otopath: str, subdir: str):
-        """
+        '''
         | otopathのoto.iniを読み込みself._datas_by_fileとself._valuesを更新する。
         | ファイルの存在は事前に確認されていること
-
+        
         Parameters
         ----------
         otopath: str
@@ -240,18 +225,18 @@ class Oto:
         ------
         UnicodeDecodeError
             ファイルがcp932でもutf-8でもなかった場合
-        """
+        '''
         try:
-            with open(otopath, encoding="cp932") as fr:
-                lines = fr.read().replace("\r", "").split("\n")
-        except UnicodeDecodeError:
+            with open(otopath, "r", encoding="cp932") as fr:
+                lines=fr.read().replace("\r", "").split("\n")
+        except:
             try:
-                with open(otopath, encoding="utf-8") as fr:
-                    lines = fr.read().replace("\r", "").split("\n")
+                with open(otopath, "r", encoding="utf-8") as fr:
+                    lines=fr.read().replace("\r", "").split("\n")
             except UnicodeDecodeError as e:
-                e.reason = f"can't read {otopath}. because required character encoding is utf-8 or cp932"
+                e.reason="can't read {}. because required character encoding is utf-8 or cp932".format(otopath)
                 raise e
-        self._datas_by_file[subdir] = []
+        self._datas_by_file[subdir]=[]
         for line in lines:
             if line == "":
                 continue
@@ -259,24 +244,11 @@ class Oto:
                 continue
             if "," not in line:
                 continue
-            filename, param = line.split("=")
-            params = param.split(",")
+            filename, param=line.split("=")
+            params=param.split(",")
             if len(params) != 6:
                 continue
-            self._datas_by_file[subdir].append(
-                OtoRecord(
-                    subdir,
-                    filename,
-                    params[0],
-                    params[1],
-                    params[4],
-                    params[5],
-                    params[2],
-                    params[3],
-                )
-            )
+            self._datas_by_file[subdir].append(OtoRecord(subdir, filename, params[0], params[1], params[4], params[5], params[2], params[3]))
             self._setValue(params[0], self._datas_by_file[subdir][-1])
-            self._setValue(
-                ".".join(os.path.join(subdir, filename).split(".")[:-1]),
-                self._datas_by_file[subdir][-1],
-            )
+            self._setValue(".".join(os.path.join(subdir, filename).split(".")[:-1]), self._datas_by_file[subdir][-1])
+
