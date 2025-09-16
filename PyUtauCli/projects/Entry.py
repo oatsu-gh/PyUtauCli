@@ -1,5 +1,13 @@
-﻿from .EntryBase import EntryBase, IntEntry, StringEntry, FloatEntry, BoolEntry, ListEntry
-import common.convert_notenum as convert_notenum
+﻿from PyUtauCli.common import convert_notenum
+
+from .EntryBase import (
+    BoolEntry,
+    EntryBase,
+    FloatEntry,
+    IntEntry,
+    ListEntry,
+    StringEntry,
+)
 
 
 class NumberEntry(StringEntry):
@@ -100,11 +108,8 @@ class ModulationEntry(IntEntry):
 
 
 class PitchesEntry(ListEntry):
-    def _check_value(self, value):
-        try:
-            return int(value)
-        except:
-            raise ValueError("{} is not int".format(value))
+    def _check_value(self, value) -> int:
+        return int(value)
 
 
 class PBStartEntry(FloatEntry):
@@ -130,122 +135,123 @@ class PBSEntry(EntryBase):
 
     @time.setter
     def time(self, value: float):
-        try:
-            self._time = float(value)
-            self._value = "{:.3f};{:.3f}".format(self._time, self._height)
-            self._set_update()
-            self._hasValue = True
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._time = float(value)
+        self._value = f'{self._time:.3f};{self._height:.3f}'
+        self._set_update()
+        self._hasValue = True
 
     @height.setter
     def height(self, value: float):
-        try:
-            self._height = float(value)
-            self._value = "{:.3f};{:.3f}".format(self._time, self._height)
-            self._set_update()
-            self._hasValue = True
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._height = float(value)
+        self._value = f'{self._time:.3f};{self._height:.3f}'
+        self._set_update()
+        self._hasValue = True
 
     @value.setter
     def value(self, value: str):
-        value = value.replace(",", ";")
-        if ";" in value:
-            values: list = value.split(";")
-            try:
-                self._time = float(values[0])
-            except:
-                raise ValueError("{} is not float".format(values[0]))
-            try:
-                self._height = float(values[1])
-            except:
-                raise ValueError("{} is not float".format(values[1]))
+        value = value.replace(',', ';')
+        if ';' in value:
+            values: list = value.split(';')
+            self._time = float(values[0])
+            self._height = float(values[1])
             self._value = value
             self._set_update()
             self._hasValue = True
         else:
-            try:
-                self._time = float(value)
-                self._height = 0
-            except:
-                raise ValueError("{} is not float".format(value))
+            self._time = float(value)
+            self._height = 0
             self._value = value
             self._set_update()
             self._hasValue = True
 
     def init(self, value: str):
-        value = value.replace(",", ";")
-        if ";" in value:
-            values: list = value.split(";")
-            try:
-                self._time = float(values[0])
-            except:
-                raise ValueError("{} is not float".format(values[0]))
-            try:
-                self._height = float(values[1])
-            except:
-                raise ValueError("{} is not float".format(values[1]))
+        value = value.replace(',', ';')
+        if ';' in value:
+            values: list = value.split(';')
+            self._time = float(values[0])
+            self._height = float(values[1])
             self._value = value
             self._hasValue = True
         else:
-            try:
-                self._time = float(value)
-                self._height = 0
-            except:
-                raise ValueError("{} is not float".format(value))
+            self._time = float(value)
+            self._height = 0
             self._value = value
             self._hasValue = True
 
     def __str__(self) -> str:
         if self._height == 0:
-            return "{:.3f}".format(self._time)
-        else:
-            return self._value
+            return f'{self._time:.3f}'
+        return self._value
 
 
 class PBYEntry(ListEntry):
     def _check_value(self, value):
-        try:
-            if value == " ":
-                value = 0
-            if value == "":
-                value = 0
-            return float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        if value == ' ':
+            value = 0
+        if value == '':
+            value = 0
+        return float(value)
 
 
 class PBWEntry(ListEntry):
     def _check_value(self, value):
-        try:
-            return float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        if value == ' ':
+            value = 0
+        if value == '':
+            value = 0
+        return float(value)
 
 
 class PBMEntry(ListEntry):
     def _check_value(self, value):
-        if value in ["", "s", "r", "j"]:
+        if value in ['', 's', 'r', 'j']:
             return str(value)
-        else:
-            raise ValueError("{} is not '',s,r,j".format(value))
+        msg = f"{value} is not '',s,r,j"
+        raise ValueError(msg)
 
 
 class EnvelopeEntry(EntryBase):
     _value: str
     _p: list
     _v: list
-    separater: str = ","
+    separater: str = ','
 
     @property
     def value(self) -> str:
         if len(self._p) == 3:
-            return "{:.2f},{:.2f},{:.2f},{},{},{},{}".format(self._p[0], self._p[1], self._p[2], self._v[0], self._v[1], self._v[2], self._v[3])
-        elif len(self._p) == 4:
-            return "{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f}".format(self._p[0], self._p[1], self._p[2], self._v[0], self._v[1], self._v[2], self._v[3], self._p[3])
-        elif len(self._p) == 5:
-            return "{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f},{:.2f},{}".format(self._p[0], self._p[1], self._p[2], self._v[0], self._v[1], self._v[2], self._v[3], self._p[3], self._p[4], self._v[4])
+            return '{:.2f},{:.2f},{:.2f},{},{},{},{}'.format(  # noqa: UP032
+                self._p[0],
+                self._p[1],
+                self._p[2],
+                self._v[0],
+                self._v[1],
+                self._v[2],
+                self._v[3],
+            )
+        if len(self._p) == 4:
+            return '{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f}'.format(  # noqa: UP032
+                self._p[0],
+                self._p[1],
+                self._p[2],
+                self._v[0],
+                self._v[1],
+                self._v[2],
+                self._v[3],
+                self._p[3],
+            )
+        if len(self._p) == 5:
+            return '{:.2f},{:.2f},{:.2f},{},{},{},{},%,{:.2f},{:.2f},{}'.format(  # noqa: UP032
+                self._p[0],
+                self._p[1],
+                self._p[2],
+                self._v[0],
+                self._v[1],
+                self._v[2],
+                self._v[3],
+                self._p[3],
+                self._p[4],
+                self._v[4],
+            )
 
         return self._value
 
@@ -273,8 +279,8 @@ class EnvelopeEntry(EntryBase):
                     self._p.append(float(tmp[i]))
                 elif i in [3, 4, 5, 6, 10]:
                     self._v.append(int(tmp[i]))
-        except:
-            raise ValueError("{} is not envelope pattern".format(value))
+        except Exception as e:
+            raise ValueError(f'{value} is not envelope pattern') from e
         self._value = value
 
     def init(self, value: list):
@@ -303,7 +309,7 @@ class VibratoEntry(EntryBase):
     _height: float
     _amp: float
     _value: str
-    separater: str = ","
+    separater: str = ','
 
     @property
     def length(self) -> float:
@@ -339,77 +345,55 @@ class VibratoEntry(EntryBase):
 
     @property
     def value(self) -> str:
-        return "{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}".format(self._length,
-                                                                         self._cycle,
-                                                                         self._depth,
-                                                                         self._fadeInTime,
-                                                                         self._fadeOutTime,
-                                                                         self._phase,
-                                                                         self._height,
-                                                                         self._amp)
+        return '{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f},{:.2f}'.format(  # noqa: UP032
+            self._length,
+            self._cycle,
+            self._depth,
+            self._fadeInTime,
+            self._fadeOutTime,
+            self._phase,
+            self._height,
+            self._amp,
+        )
 
     @length.setter
     def length(self, value: float):
-        try:
-            self._length = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._length = float(value)
         self._set_update()
 
     @cycle.setter
     def cycle(self, value: float):
-        try:
-            self._cycle = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._cycle = float(value)
         self._set_update()
 
     @depth.setter
     def depth(self, value: float):
-        try:
-            self._depth = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._depth = float(value)
         self._set_update()
 
     @fadeInTime.setter
     def fadeInTime(self, value: float):
-        try:
-            self._fadeInTime = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._fadeInTime = float(value)
         self._set_update()
 
     @fadeOutTime.setter
     def fadeOutTime(self, value: float):
-        try:
-            self._fadeOutTime = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._fadeOutTime = float(value)
         self._set_update()
 
     @phase.setter
     def phase(self, value: float):
-        try:
-            self._phase = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._phase = float(value)
         self._set_update()
 
     @height.setter
     def height(self, value: float):
-        try:
-            self._height = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._height = float(value)
         self._set_update()
-        
+
     @amp.setter
     def amp(self, value: float):
-        try:
-            self._amp = float(value)
-        except:
-            raise ValueError("{} is not float".format(value))
+        self._amp = float(value)
         self._set_update()
 
     @value.setter

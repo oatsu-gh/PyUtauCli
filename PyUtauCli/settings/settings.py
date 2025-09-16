@@ -1,4 +1,4 @@
-﻿'''Settins
+﻿"""Settins
 各種定数や初期値の設定
 
 Attributes
@@ -21,9 +21,8 @@ VOICE_ROOT: list of str
     | 音源フォルダのルート
     | windows環境では、UTAU.exeと同じ階層のsetting.iniに記載あり
 
-'''
+"""
 
-import platform
 import os
 import os.path
 
@@ -35,11 +34,11 @@ VOICE_ROOT: list = []
 if UTAU_IS_INSTALLED:
     UTAU_ROOT: str = win_utau.get_utau_root()
     UTAU_SETTINGS = win_utau.get_utau_settings()
-    if "VoiceRoot" in UTAU_SETTINGS:
-        VOICE_ROOT.append(UTAU_SETTINGS["VoiceRoot"])
-    VOICE_ROOT.append(os.path.join(os.environ["appdata"], "UTAU", "voice"))
-    VOICE_ROOT.append(os.path.join(UTAU_ROOT, "voice"))
+    if 'VoiceRoot' in UTAU_SETTINGS:
+        VOICE_ROOT.append(UTAU_SETTINGS['VoiceRoot'])
+    VOICE_ROOT.append(os.path.join(os.environ['appdata'], 'UTAU', 'voice'))
+    VOICE_ROOT.append(os.path.join(UTAU_ROOT, 'voice'))
 else:
-    UTAU_ROOT: str = ""
-    
-DEFAULT_ENV: str = UTAU_SETTINGS.get("DefaultEnv", "0 10 35 0 100 100 0")
+    UTAU_ROOT: str = ''
+
+DEFAULT_ENV: str = UTAU_SETTINGS.get('DefaultEnv', '0 10 35 0 100 100 0')

@@ -1,13 +1,14 @@
-﻿'''EntryBase
+﻿"""EntryBase
 各ノートパラメータ設定用のベースクラスを定義します。
-'''
+"""
 
 
 class EntryBase:
-    '''
+    """
     エントリー用のベースクラスです。
     継承して使います。
-    '''
+    """
+
     _isUpdate: bool = False
     _hasValue: bool = False
 
@@ -24,11 +25,12 @@ class EntryBase:
 
 
 class StringEntry(EntryBase):
-    '''
+    """
     Str型のvalueをもつエントリー用のベースクラスです。
     継承して使います。
-    '''
-    _value: str = ""
+    """
+
+    _value: str = ''
 
     @property
     def value(self) -> str:
@@ -49,10 +51,11 @@ class StringEntry(EntryBase):
 
 
 class IntEntry(EntryBase):
-    '''
+    """
     int型のvalueをもつエントリー用のベースクラスです。
     継承して使います。
-    '''
+    """
+
     _value: int = 0
 
     @property
@@ -65,25 +68,28 @@ class IntEntry(EntryBase):
             self._value = int(value)
             self._set_update()
             self._hasValue = True
-        except:
-            raise ValueError("{} is not int".format(value))
+        except Exception as e:
+            msg = f'{value} is not int'
+            raise ValueError(msg) from e
 
     def init(self, value: int):
         try:
             self._value = int(value)
             self._hasValue = True
-        except:
-            raise ValueError("{} is not int".format(value))
+        except Exception as e:
+            msg = f'{value} is not int'
+            raise ValueError(msg) from e
 
     def __str__(self) -> str:
         return str(self.value)
 
 
 class FloatEntry(EntryBase):
-    '''
+    """
     float型のvalueをもつエントリー用のベースクラスです。
     継承して使います。
-    '''
+    """
+
     _value: float = 0.0
     point: int = 3
 
@@ -97,25 +103,28 @@ class FloatEntry(EntryBase):
             self._value = float(value)
             self._set_update()
             self._hasValue = True
-        except:
-            raise ValueError("{} is not float".format(value))
+        except Exception as e:
+            msg = f'{value} is not float'
+            raise ValueError(msg) from e
 
     def init(self, value: float):
         try:
             self._value = float(value)
             self._hasValue = True
-        except:
-            raise ValueError("{} is not float".format(value))
+        except Exception as e:
+            msg = f'{value} is not float'
+            raise ValueError(msg) from e
 
     def __str__(self) -> str:
-        return ("{:." + str(self.point) + "f}").format(self._value)
+        return ('{:.' + str(self.point) + 'f}').format(self._value)
 
 
 class BoolEntry(EntryBase):
-    '''
+    """
     bool型のvalueをもつエントリー用のベースクラスです。
     継承して使います。
-    '''
+    """
+
     _value: bool = False
 
     @property
@@ -137,13 +146,14 @@ class BoolEntry(EntryBase):
 
 
 class ListEntry(EntryBase):
-    '''
+    """
     list型のvalueをもつエントリー用のベースクラスです。
     継承して使います。
     各パラメータのフォーマットが適切かは、self._checl_valueを継承して定義します。
-    '''
+    """
+
     _value: list = []
-    separater: str = ","
+    separater: str = ','
 
     @property
     def value(self) -> list:
@@ -158,12 +168,12 @@ class ListEntry(EntryBase):
         self._hasValue = True
 
     def _check_value(self, value):
-        '''
+        """
         Raises
         ------
         ValueError
             値が不適切な時
-        '''
+        """
         return value
 
     def init(self, value: list):

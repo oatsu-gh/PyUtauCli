@@ -3,13 +3,15 @@ import os.path
 
 from .Ust import Ust
 
+
 class UtauPlugin(Ust):
-    '''
+    """
     | UTAUのプラグイン用一時ファイルを扱います。
     | ほぼ、Ustと共通の仕様ですが、主に書き出しに関する仕様が異なります。
-    '''
-    def save(self, filepath: str = "", encoding: str = "cp932"):
-        '''
+    """
+
+    def save(self, filepath: str = '', encoding: str = 'cp932'):
+        """
         | self.filepathもしくはfilepathにファイルを保存します。
         | windows版UTAUとの互換性を優先してcp932を優先します。
 
@@ -17,61 +19,61 @@ class UtauPlugin(Ust):
         ----------
         filepath: str, default ""
         encoding: str, default "cp932"
-        '''
-        if filepath != "":
+        """
+        if filepath != '':
             self.filepath = filepath
-        if os.path.split(self.filepath)[0] != "":
+        if os.path.split(self.filepath)[0] != '':
             os.makedirs(os.path.split(self.filepath)[0], exist_ok=True)
-        self.logger.info("saving utau plugin temp to:{}".format(self.filepath))
-        with open(self.filepath, "w", encoding=encoding) as fw:
+        self.logger.info(f'saving utau plugin temp to:{self.filepath}')
+        with open(self.filepath, 'w', encoding=encoding) as fw:
             for note in self.notes:
-                fw.write("[{}]\n".format(str(note.num)))
-                if note.num.value == "#DELETE":
+                fw.write(f'[{str(note.num)}]\n')
+                if note.num.value == '#DELETE':
                     continue
                 if note.length.hasValue and note.length.isUpdate:
-                    fw.write("Length={}\n".format(str(note.length)))
+                    fw.write(f'Length={str(note.length)}\n')
                 if note.lyric.hasValue and note.lyric.isUpdate:
-                    fw.write("Lyric={}\n".format(str(note.lyric)))
+                    fw.write(f'Lyric={str(note.lyric)}\n')
                 if note.notenum.hasValue and note.notenum.isUpdate:
-                    fw.write("NoteNum={}\n".format(str(note.notenum.value)))
+                    fw.write(f'NoteNum={str(note.notenum.value)}\n')
                 if note.tempo.hasValue and note.tempo.isUpdate:
-                    fw.write("Tempo={}\n".format(str(note.tempo)))
+                    fw.write(f'Tempo={str(note.tempo)}\n')
                 if note.pre.hasValue and note.pre.isUpdate:
-                    fw.write("PreUtterance={}\n".format(str(note.pre)))
+                    fw.write(f'PreUtterance={str(note.pre)}\n')
                 if note.ove.hasValue and note.ove.isUpdate:
-                    fw.write("VoiceOverlap={}\n".format(str(note.ove)))
+                    fw.write(f'VoiceOverlap={str(note.ove)}\n')
                 if note.stp.hasValue and note.stp.isUpdate:
-                    fw.write("StartPoint={}\n".format(str(note.stp)))
+                    fw.write(f'StartPoint={str(note.stp)}\n')
                 if note.velocity.hasValue and note.velocity.isUpdate:
-                    fw.write("Velocity={}\n".format(str(note.velocity)))
+                    fw.write(f'Velocity={str(note.velocity)}\n')
                 if note.intensity.hasValue and note.intensity.isUpdate:
-                    fw.write("Intensity={}\n".format(str(note.intensity)))
+                    fw.write(f'Intensity={str(note.intensity)}\n')
                 if note.modulation.hasValue and note.modulation.isUpdate:
-                    fw.write("Modulation={}\n".format(str(note.modulation)))
+                    fw.write(f'Modulation={str(note.modulation)}\n')
                 if note.pitches.hasValue and note.pitches.isUpdate:
-                    fw.write("Pitches={}\n".format(str(note.pitches)))
+                    fw.write(f'Pitches={str(note.pitches)}\n')
                 if note.pbStart.hasValue and note.pbStart.isUpdate:
-                    fw.write("PBStart={}\n".format(str(note.pbStart)))
+                    fw.write(f'PBStart={str(note.pbStart)}\n')
                 if note.pbs.hasValue and note.pbs.isUpdate:
-                    fw.write("PBS={}\n".format(str(note.pbs)))
+                    fw.write(f'PBS={str(note.pbs)}\n')
                 if note.pby.hasValue and note.pby.isUpdate:
-                    fw.write("PBY={}\n".format(str(note.pby)))
+                    fw.write(f'PBY={str(note.pby)}\n')
                 if note.pbm.hasValue and note.pbm.isUpdate:
-                    fw.write("PBM={}\n".format(str(note.pbm)))
+                    fw.write(f'PBM={str(note.pbm)}\n')
                 if note.pbw.hasValue and note.pbw.isUpdate:
-                    fw.write("PBW={}\n".format(str(note.pbw)))
+                    fw.write(f'PBW={str(note.pbw)}\n')
                 if note.flags.hasValue and note.flags.isUpdate:
-                    fw.write("Flags={}\n".format(str(note.flags)))
+                    fw.write(f'Flags={str(note.flags)}\n')
                 if note.vibrato.hasValue and note.vibrato.isUpdate:
-                    fw.write("VBR={}\n".format(str(note.vibrato)))
+                    fw.write(f'VBR={str(note.vibrato)}\n')
                 if note.envelope.hasValue and note.envelope.isUpdate:
-                    fw.write("Envelope={}\n".format(str(note.envelope)))
+                    fw.write(f'Envelope={str(note.envelope)}\n')
                 if note.label.hasValue and note.label.isUpdate:
-                    fw.write("Label={}\n".format(str(note.label)))
+                    fw.write(f'Label={str(note.label)}\n')
                 if note.direct.hasValue and note.direct.isUpdate:
-                    fw.write("$direct={}\n".format(str(note.direct)))
+                    fw.write(f'$direct={str(note.direct)}\n')
                 if note.region.hasValue and note.region.isUpdate:
-                    fw.write("$region={}\n".format(str(note.region)))
+                    fw.write(f'$region={str(note.region)}\n')
                 if note.region_end.hasValue and note.region_end.isUpdate:
-                    fw.write("$region_end={}\n".format(str(note.region_end)))
-        self.logger.info("saving utau plugin temp to:{} complete".format(self.filepath))
+                    fw.write(f'$region_end={str(note.region_end)}\n')
+        self.logger.info(f'saving utau plugin temp to:{self.filepath} complete')
